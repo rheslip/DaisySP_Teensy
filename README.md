@@ -10,7 +10,7 @@ DaisySP is a DSP library consisting mostly of code collected from other projects
 
 DaisySP uses floating point for all DSP operations and as such will run slowly on the Teensy 3.x - this has not been tested. On a Teensy 4.x each DaisySP function consumes roughly 1% of the CPU so you could create a polyphonic synth with 10 oscillators, 10 envelope generators and 10 filters and still have lots of CPU left. The sine oscillator uses up more CPU since its implemented as a trig function. DaisySP has antialiased polyblep oscillators which are quite CPU efficient.
 
-This implementation creates DaisySP as a Teensy Audio object. Currently it supports one instance of a DaisySP object - more may be possible but I'm not good enough with C++ to figure it out. A DaisySP object is a Teensy Audio synth - it has no inputs and it outputs a single stream of audio samples which can be processed by other Teensy audio objects.
+This implementation adds a DaisySP Teensy Audio synth object to the Teensy Audio library. An Audio Library synth object has no inputs and it outputs a single stream of audio samples. The library currently supports only one instance of a DaisySP object - more may be possible but I'm not good enough with C++ to figure it out. 
 The simplest setup is a DaisySP object to the Teensy Audio Sheild object which is set up like this:
 
 AudioSynthDaisySP synth;  // create the daisysp synth audio object
