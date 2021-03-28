@@ -1,6 +1,6 @@
 # DaisySP_Teensy
 
-DaisySP DSP Library for the Teensy 4
+DaisySP DSP Library for the Teensy 4.x
 
 Alpha release 0.1 March 28 2021
  
