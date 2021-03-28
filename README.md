@@ -4,7 +4,11 @@ DaisySP DSP Library for the Teensy 4
 
 Alpha release 0.1 March 28 2021
  
-This is a port of Electrosmith's DaisySP signal processing library to the PJRC Teensy 4.x https://github.com/electro-smith/DaisySP. This library allows you to use the features of the Teensy Audio library and DaisySP together. Teensy Audio is fast and memory efficient but has a limited selection of DSP functions. DaisySP is a bit of a CPU and memory hog but it has some sophisticated audio processing functions. The Teensy 4.x is VERY fast and you can do a lot of signal processing with it.
+This is a port of Electrosmith's DaisySP signal processing library
+
+https://github.com/electro-smith/DaisySP
+
+to the PJRC Teensy 4.x. This library allows you to use the features of the Teensy Audio library and DaisySP together. Teensy Audio is fast and memory efficient but has a limited selection of DSP functions. DaisySP is a bit of a CPU and memory hog but it has some sophisticated audio processing functions. The Teensy 4.x is VERY fast and you can do a lot of signal processing with it.
  
 DaisySP consists mostly of code collected from other projects - Csound, Soundpipe, and Mutable Instruments eurorack modules. DaisySP is quite similar to Soundpipe but much better written and documented. I ported Soundpipe first and then realized DaisySP is much better.
 
