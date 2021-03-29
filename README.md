@@ -1,6 +1,6 @@
 # DaisySP_Teensy
 
-DaisySP DSP Library for the Teensy 4.x
+DaisySP DSP Library for the Teensy 4.x 
 
 Alpha release 0.1 March 28 2021
  
@@ -12,7 +12,7 @@ to the PJRC Teensy 4.x. This library allows you to use the features of the Teens
  
 DaisySP consists mostly of code collected from other projects - Csound, Soundpipe, and Mutable Instruments eurorack modules. DaisySP is quite similar to Soundpipe but much better written and documented. I ported Soundpipe first and then realized DaisySP is much better.
 
-DaisySP uses floating point for all DSP operations and as such will run slowly on the Teensy 3.x - this has not been tested. On a Teensy 4.x each DaisySP function call consumes roughly 1% of the CPU so you could create a polyphonic synth with 10 oscillators, 10 envelope generators and 10 filters and still have lots of CPU left. The sine oscillator uses up more CPU since its implemented as a trig function. DaisySP has antialiased polyblep oscillators which are quite CPU efficient - much better than the simplistic and noisy waveform generators in the Teensy Audio library.
+DaisySP uses floating point for all DSP operations and as such will run slowly on the Teensy 3.x - this has not been tested. On a Teensy 4.x most DaisySP functions (oscillators, envelope generators etc) consume roughly 1% of the CPU so you could create a polyphonic synth with 10 oscillators, 10 envelope generators and 10 filters and still have lots of CPU left. The physical modelling functions use quite a lot of CPU. The sine oscillator uses up more CPU since its implemented as a trig function. DaisySP has antialiased polyblep oscillators which are quite CPU efficient - much better than the simplistic and noisy waveform generators in the Teensy Audio library.
 
 This implementation adds a DaisySP Teensy Audio synth object to the Teensy Audio library. An Audio Library synth object has no inputs and it outputs a single stream of audio samples. The library currently supports only one instance of a DaisySP object - more may be possible but I'm not good enough with C++ to figure it out. 
 The simplest setup is a DaisySP object to the Teensy Audio Shield object which is set up like this:
