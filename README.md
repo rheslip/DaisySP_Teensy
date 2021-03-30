@@ -27,7 +27,7 @@ AudioConnection patchCord1(synth,0,out,0);  // patch mono synth to right and lef
 
 AudioConnection patchCord2(synth,0,out,1);
 
-Teensy Audio processes 128 16 bit integer samples at a time and uses a dynamic pool of sample buffers which are passed between audio objects. This is memory and CPU efficient but can make coding audio objects quite complicated because of the dynamic sample buffer management. Every audio object has a callback function which processes blocks of samples approximately every 2.3 ms @ 44.1khz sample rate.
+Teensy Audio processes 128 16 bit integer samples at a time and uses a pool of sample buffers which are passed between audio objects. This is memory and CPU efficient but can make coding audio objects quite complicated because of the sample buffer management. Every audio object has a callback function which processes blocks of samples approximately every 2.3 ms @ 44.1khz sample rate.
 
 In contrast, DaisySP processes one sample at a time using floating point and each function allocates its memory statically. Simple, but uses a lot of memory for things like reverbs and delays and its pretty CPU intensive. 
 
