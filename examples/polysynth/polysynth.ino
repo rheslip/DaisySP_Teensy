@@ -1,9 +1,8 @@
 
 // test of DaisySP synth object for the Teensy audio library
-// modal synth - not very polyphonic because it uses about 30% CPU for one resonator
-// its a good starting point for polyphonic instruments in any case
+// simple poly synth 
 // some of this code was cribbed from the Faust for Teensy Additivesynth example
-// RH March 28 2021
+// RH March 29 2021
 
 #include <Audio.h>
 #include <Metro.h>
@@ -18,27 +17,48 @@ Metro five_sec=Metro(5000); // Set up a 5 second Metro for performance stats
 #define MULT_16 2147483647
 #define DIV_16 4.6566129e-10
 
+// for polyphony - an array of all current notes. 
+// Value -1 means the note is off (not sounding).
+#define VOICES 16   // 
+int StoredNotes[VOICES];
+
 #include "daisysp.h"
 using namespace daisysp;
 
 // including the source files is a pain but that way you compile in only the modules you need
 // DaisySP statically allocates memory and some modules e.g. reverb use a lot of ram
-#include "physicalmodeling/resonator.cpp"
-#include "physicalmodeling/modalvoice.cpp"
+#include "synthesis/oscillator.cpp"
+#include "control/adsr.cpp"
+#include "filters/moogladder.cpp"
 #include "effects/reverbsc.cpp"  // uses a LOT of ram
 
 float samplerate=AUDIO_SAMPLE_RATE_EXACT;
 
-// create daisySP processing objects
+// parameters we can modify via MIDI CCs
+int waveform=0;
+float detune=0;
+float filterfreq=100;
+float filtersweep=3000;
+float filterresonance=0.3;
+float reverblevel=0.1;
+float lfofreq=0.1;
+float lfofreqdepth=0;
+float lfofilterdepth=0;
 
-#define VOICES 3   // 87% CPU with 3 voices 811mhz overclock
-daisysp::ModalVoice voice[VOICES];
+// create daisySP processing objects
+#define OSCSPERVOICE 3   // note - the detune code is set up for 3 oscillators
+
+Oscillator osc[VOICES * OSCSPERVOICE];
+Oscillator lfo;
+Adsr      env[VOICES];
+MoogLadder filt[VOICES];
 ReverbSc   verb;  
 
 // this is the function called by the AudioSynthDaisySP object when it needs a block of samples
 void AudioSynthDaisySP::update(void)
 {
-  float out,sig,wetvl, wetvr;
+  float out,sig,outsig,envelope,filtsig,wetvl, wetvr;
+  bool gate;
   audio_block_t *block;
 
   block = allocate(); // grab an audio block
@@ -50,15 +70,27 @@ void AudioSynthDaisySP::update(void)
 
 //**** insert daisySP generators here
 
-    sig=0; // process and sum the string voices
-    for (int i=0; i< VOICES;++i) {
-      sig+=voice[i].Process();
-    }
-    sig=sig/VOICES; // scale the sum 
-//  sig=sig*5; // crank the level a bit
-    verb.Process(sig, sig, &wetvl, &wetvr); 
+    outsig=0; // sum up voices
+    for (int i=0; i<VOICES;++i) {
 
-    out=sig + wetvl*0.2;   // add in some reverb
+      sig=0;
+      for (int j=0; j < OSCSPERVOICE; ++j) {
+        sig+=osc[i*OSCSPERVOICE + j].Process(); // sum oscillators in each voice
+      }
+      sig=sig/OSCSPERVOICE; // scale down by number of oscillators
+      if (StoredNotes[i] == -1) gate=false; // if voice is allocated then it is active
+      else gate=true; 
+      envelope=env[i].Process(gate);
+      sig=sig*envelope;
+      filt[i].SetFreq(filterfreq+envelope*filtersweep);
+      //filt[i].SetFreq(200+envelope*3000*(lfo.Process()+1));
+      filtsig=filt[i].Process(sig);
+      outsig+=filtsig;
+    }
+    outsig=outsig*8/VOICES; // scale the sum 
+    verb.Process(outsig, outsig, &wetvl, &wetvr); 
+
+    out=outsig + wetvl*reverblevel;
     
 // convert generated float value -1.0 to +1.0 to int16 used by Teensy Audio    
     int32_t val = out*MULT_16;
@@ -71,15 +103,14 @@ void AudioSynthDaisySP::update(void)
 // teensy audio objects and patch creation
 
 AudioOutputI2S out;
-//AudioOutputUSB outUSB;
+//AudioOutputUSB outUSB;  // USB audio breaks up badly
 AudioControlSGTL5000 audioShield;
-
 AudioSynthDaisySP synth;  // create the daisysp synth audio object
 
-AudioConnection patchCord20(synth,0,out,0);
-AudioConnection patchCord21(synth,0,out,1);
-//AudioConnection patchCord22(synth,0,outUSB,0);
-//AudioConnection patchCord23(synth,0,outUSB,1);
+AudioConnection patchCord1(synth,0,out,0);
+AudioConnection patchCord2(synth,0,out,1);
+//AudioConnection patchCord3(synth,0,outUSB,0);
+//AudioConnection patchCord4(synth,0,outUSB,1);
 
 // frequencies for all 127 MIDI Note numbers.
 //     C         C#        D         D#        E         F         F#        G         G#        A         A#        B
@@ -97,10 +128,6 @@ const float NoteNumToFreq[] = {
  4186.01,  4434.92,  4698.64,  4978.03,  5274.04,  5587.65,  5919.91,  6271.93,  6644.88,  7040.00,  7458.62,  7902.13,  
  8372.02,  8869.84,  9397.27,  9956.06, 10548.08, 11175.30, 11839.82, 12543.85 };
 
-// for polyphony - an array of all current notes. 
-// Value -1 means the note is off (not sounding).
-
-int StoredNotes[VOICES];
 
 void setup() { 
   Serial.begin(38400);
@@ -114,9 +141,20 @@ void setup() {
 
   for (int i=0; i< VOICES;++i) {  
       StoredNotes[i]=-1;  // initialize the note allocation array
-      voice[i].Init(samplerate);       // initialize the voice object
+      for (int j=0; j< OSCSPERVOICE; ++j) {
+        osc[i*OSCSPERVOICE +j].Init(samplerate);       // initialize the voice objects
+        osc[i*OSCSPERVOICE +j].SetWaveform(Oscillator::WAVE_POLYBLEP_SAW);  // changing waveforms on the fly seems to cause a crash    
+      }
+      env[i].Init(samplerate);
+      env[i].SetTime(ADENV_SEG_DECAY, 1.0f);
+      filt[i].Init(samplerate);
   }
 
+  lfo.Init(samplerate); // Init LFO oscillator
+  lfo.SetFreq(0.1);
+
+//  env.SetCurve(-15.0f); // only for AR env
+    
 // initialize the reverb object and set its initial parameters
   verb.Init(samplerate);
   verb.SetFeedback(0.87);
@@ -126,7 +164,7 @@ void setup() {
   AudioMemory(10);  // only uses 2 blocks
   Serial.println("enabling audio shield");    
   audioShield.enable();
-  audioShield.volume(0.4);
+  audioShield.volume(0.8);
 
 
   // Handles for the USB MIDI callbacks
@@ -145,7 +183,7 @@ void setup() {
 
 void loop() {
   usbMIDI.read();
-
+  
 #ifdef DEBUG
   // DEBUG - Microcontroller Load Check
     if (five_sec.check() == 1)
@@ -171,8 +209,11 @@ void myNoteOn(byte channel, byte note, byte velocity) {
   while( i < VOICES){
     if (StoredNotes[i] == -1) {  // if voice is idle
       StoredNotes[i] = int(note); // allocate this voice
-      voice[i].SetFreq(NoteNumToFreq[note]);  
-      voice[i].Trig();
+      osc[i*OSCSPERVOICE].SetFreq(NoteNumToFreq[note]);  
+      osc[i*OSCSPERVOICE+1].SetFreq(NoteNumToFreq[note]+detune);   // quick and dirty detune
+      osc[i*OSCSPERVOICE+2].SetFreq(NoteNumToFreq[note]-detune);
+
+//      env[i].Trigger(); // ADSR triggering happens in the sample loop
       break;
     }
     ++i;
@@ -202,18 +243,43 @@ void myControlChange(byte channel, byte control, byte value) {
   for (int i=0; i < VOICES; ++i){
     switch (control) {
       case 101:
-        voice[i].SetBrightness(val);
+        waveform=value/40; // chaning waveforms on the fly doesn't seem to work
         break;
       case 102:
-        voice[i].SetDamping(val);    
+        detune=val*5;  // oscillator detune
         break;
       case 103:
-        voice[i].SetStructure(val);    
+    
+        break;
+      case 105:
+        env[i].SetTime(ADSR_SEG_ATTACK,val);
+        break;
+      case 106:
+        env[i].SetTime(ADSR_SEG_DECAY,val);
+        break;    
+      case 107:
+        env[i].SetSustainLevel(val);
+        break;  
+      case 108:
+        env[i].SetTime(ADSR_SEG_RELEASE,val);
+        break;
+      case 113:
+        filterfreq=50+val*2000; // filter cutoff
+        break;
+      case 114:
+        filtersweep=val*10000; // filter sweep - controlled by envelope
+        break;
+      case 115:
+        filt[i].SetRes(val); // filter resonance
+        break;
+      case 116:
+        reverblevel=val; // reverb
         break;
       default:
         break;
     }
   }
+
 }
 
 // Callback for incoming Aftertouch messages
