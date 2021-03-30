@@ -7,7 +7,7 @@
 #include <Audio.h>
 #include <Metro.h>
 
-//#define DEBUG   // comment out to remove debug code
+#define DEBUG   // comment out to remove debug code
 
 #ifdef DEBUG
 Metro five_sec=Metro(5000); // Set up a 5 second Metro for performance stats
@@ -46,7 +46,7 @@ float lfofreqdepth=0;
 float lfofilterdepth=0;
 
 // create daisySP processing objects
-#define OSCSPERVOICE 3   // note - the detune code is set up for 3 oscillators
+#define OSCSPERVOICE 4   // note - the detune code is set up for 3 oscillators
 
 Oscillator osc[VOICES * OSCSPERVOICE];
 Oscillator lfo;
@@ -66,7 +66,7 @@ void AudioSynthDaisySP::update(void)
     return;
   }
 
-  for (int i=0; i < AUDIO_BLOCK_SAMPLES; i++) {
+  for (int s=0; s < AUDIO_BLOCK_SAMPLES; s++) {
 
 //**** insert daisySP generators here
 
@@ -94,7 +94,7 @@ void AudioSynthDaisySP::update(void)
     
 // convert generated float value -1.0 to +1.0 to int16 used by Teensy Audio    
     int32_t val = out*MULT_16;
-    block->data[i] = val >> 16;
+    block->data[s] = val >> 16;
   }
   transmit(block);
   release(block);

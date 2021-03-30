@@ -31,7 +31,7 @@ Teensy Audio processes 128 16 bit integer samples at a time and uses a pool of s
 
 In contrast, DaisySP processes one sample at a time using floating point and each function allocates its memory statically. Simple, but uses a lot of memory for things like reverbs and delays and its pretty CPU intensive. 
 
-To use DaisySP with Teensy Audio we process 128 samples at a time, convert the floating point results to integer and pass them to the next Teensy audio object in the patch. The DaisySP audio object has a callback function called AudioSynthDaisySP::update which does this. You must have this function in your sketch and this is where you call DaisySP library functions. Look at the example sketch to see how this works.
+To use DaisySP with Teensy Audio we process 128 samples at a time, convert the floating point results to integer and pass them to the next Teensy audio object in the patch. The DaisySP audio object has a callback function called AudioSynthDaisySP::update which does this. You must have this function in your sketch and this is where you call DaisySP library functions. Look at the example sketches to see how this works.
 
 Installing the library:
 
@@ -39,7 +39,7 @@ Copy the contents of the DaisySP folder to your arduino/library folder
 
 Copy the file Teensy/Audio/synth_daisysp.h (the DaisySP audio object) to your Teensy audio library - usually this will be your_Arduino_installation_directory/hardware/teensy/avr/libraries/audio. 
 
-Teensy/Audio/Audio.h has been modified to include synth_daisysp.h. You may want to do this manually since I can't guarantee I will be tracking changes to the Teensy Audio library.
+Teensy/Audio/Audio.h has a #include synth_daisysp.h so you can replace your Teensy audio library Audio.h with this file. Its probably better edit your existing Audio.h file - I can't guarantee I will be tracking future changes to the Teensy Audio library.
 
 
 I decided to structure the library so you have to manually include the DaisySP *.cpp files you are using in your sketch vs compiling the whole library into the sketch. This is a bit of a pain but including the whole library uses almost 500k of program memory and close to 500k of RAM which leaves very little RAM for the rest of your code. There is currently no provision for using the optional PSRAM on the Teensy 4.1.
