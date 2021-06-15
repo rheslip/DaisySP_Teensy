@@ -30,7 +30,7 @@ AudioConnection patchCord2(Mysynth,0,out,1);
 
 A DaisySP effect object would be set up like this:
 
-AudioEffectDaisySP Myeffect;  // create the daisysp synth audio object
+AudioEffectDaisySP Myeffect;  // create the daisysp effect audio object
 
 AudioInputI2S       audioInput;         // audio shield: mic or line-in
 
@@ -62,9 +62,9 @@ Teensy/Audio/Audio.h has the lines #include synth_daisysp.h and #include effect_
 
 I decided to structure the library so you have to manually include the DaisySP *.cpp files you are using in your sketch vs compiling the whole library into the sketch. This is a bit of a pain but including the whole library uses almost 500k of program memory and close to 500k of RAM which leaves very little RAM for the rest of your code. There is currently no provision for using the optional PSRAM on the Teensy 4.1.
 
-I have not tested the library extensively. It should be fairly simple to add a DaisySP audio effect object (ie one that has inputs and outputs) and one that generates stereo audio out for the DaisySP functions generate stereo audio. I have not had a need for this yet so its not in the library.
+I have not tested the library extensively. It should be fairly simple to add a DaisySP audio effect object that has two outputs for the DaisySP functions that generate stereo audio. I have not had a need for this yet so its not in the library.
 
-There are compile problems with the resonators etc. I think this an issue with derived classes but I have not been able to fix it as yet.
+There are compile problems with the resonator objects. I think this an issue with derived classes but I have not been able to fix it as yet.
 
 Tested with Arduino 1.85 and Teensyduino 1.53.
 
