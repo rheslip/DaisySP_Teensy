@@ -2,7 +2,11 @@
 
 DaisySP DSP Library for the Teensy 4.x - now compatible with Raspberry Pi Pico 2
 
-Updated Jan 2026 for Pico 2. Works very well on Pico 2 using just the DaisySP library - no Teensy audio framework needed. See the 2HPico-Sketches archive for examples. All the examples use both cores on the Pico for efficiency with most of the DSP running on the second core.
+Updated Jan 2026 for Pico 2. Works very well on Pico 2 using just the DaisySP library - no Teensy audio framework needed. See the 2HPico-Sketches archive for examples:
+
+ https://github.com/rheslip/2HPico-Sketches
+
+ All the examples use both cores on the Pico for efficiency with most of the DSP running on the second core.
 
 The Teensy Audio framework has been ported to the Pico 2 as well https://github.com/ghostintranslation/pico-audio
  
@@ -15,6 +19,10 @@ to the PJRC Teensy 4.x for Arduino Teensy and Arduino Pico. This library allows 
 DaisySP consists mostly of code collected from other projects - Csound, Soundpipe, and Mutable Instruments eurorack modules. DaisySP is quite similar to Soundpipe but much better written and documented. I ported Soundpipe first and then realized DaisySP is much better.
 
 DaisySP uses floating point for all DSP operations and as such will run slowly on the Teensy 3.x - this has not been tested. On a Teensy 4.x most DaisySP functions (oscillators, envelope generators etc) consume roughly 1% of the CPU so you could create a polyphonic synth with 10 oscillators, 10 envelope generators and 10 filters and still have lots of CPU left. The physical modelling functions use quite a lot of CPU. The sine oscillator uses up more CPU since its implemented as a trig function. DaisySP has antialiased polyblep oscillators which are quite CPU efficient - much better than the simplistic and noisy waveform generators in the Teensy Audio library.
+
+On the Pico 2 you will typically process audio samples in a tight loop - the examples linked above use the second core of the Pico 2 for this, leaving the first core available for handling physical devices and user interfaces. Take a look at ElectroSmith's DaisySP examples as well to see how the signal flow works.
+
+On the Teensy we use the Teensy Audio framework which uses a somewhat different approach - 128 samples are processed as a block in a background interrupt process. Teensy Audio also uses fixed point math and the ARM Neon DSP instructions for speed. Since DaisySP uses floating point, samples must be converted from integer to float and back for each block of samples when using the DaisySP library functions.
 
 This implementation adds a DaisySP Teensy Audio synth object and a DaisySP Teensy Audio effect object to the Teensy Audio library. The DaisySP synth object has no inputs and one output ie its a generator of audio samples. The DaisySP effect object has one input and one output. The implementation currently supports only one instance of a DaisySP object - more may be possible but I'm not good enough with C++ to figure it out. 
 The simplest setup is a DaisySP synth object to the Teensy Audio Shield object which is set up like this:
@@ -68,7 +76,7 @@ I have not tested the library extensively. It should be fairly simple to add a D
 
 There are compile problems with the resonator objects. I think this an issue with derived classes but I have not been able to fix it as yet.
 
-Originally ested with Arduino 1.85 and Teensyduino 1.53. Latest updates ested with Pico 2 and Arduino 2.2.7.
+Originally tested with Arduino 1.85 and Teensyduino 1.53. Latest updates tested with Pico 2 and Arduino 2.2.7.
 
 Rich Heslip rheslip@hotmail.com
 
