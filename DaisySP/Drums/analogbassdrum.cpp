@@ -1,5 +1,6 @@
-#include "../utility/dsp.h"
 #include "analogbassdrum.h"
+#include "../utility/dsp.h"
+
 #include <cmath>
 
 using namespace daisysp;
@@ -27,7 +28,7 @@ void AnalogBassDrum::Init(float sample_rate)
     SetAccent(.1f);
     SetFreq(50.f);
     SetTone(.1f);
-    SetDecay(.3f);
+    SetDecay(.6f);
     SetSelfFmAmount(1.f);
     SetAttackFmAmount(.5f);
 

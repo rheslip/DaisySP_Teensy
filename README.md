@@ -1,14 +1,16 @@
 # DaisySP_Teensy
 
-DaisySP DSP Library for the Teensy 4.x 
+DaisySP DSP Library for the Teensy 4.x - now compatible with Raspberry Pi Pico 2
 
-Alpha release 0.2 June 14 2021
+Updated Jan 2026 for Pico 2. Works very well on Pico 2 using just the DaisySP library - no Teensy audio framework needed. See the 2HPico-Sketches archive for examples. All the examples use both cores on the Pico for efficiency with most of the DSP running on the second core.
+
+The Teensy Audio framework has been ported to the Pico 2 as well https://github.com/ghostintranslation/pico-audio
  
-This is a port of Electrosmith's DaisySP signal processing library
+This is a port of Electrosmith's DaisySP signal processing library 
 
 https://github.com/electro-smith/DaisySP
 
-to the PJRC Teensy 4.x. This library allows you to use the features of the Teensy Audio library and DaisySP together. Teensy Audio is fast and memory efficient but has a limited selection of DSP functions. DaisySP is a bit of a CPU and memory hog but it has some sophisticated audio processing functions. The Teensy 4.x is VERY fast and you can do a lot of signal processing with it.
+to the PJRC Teensy 4.x for Arduino Teensy and Arduino Pico. This library allows you to use the features of the Teensy Audio library and DaisySP together, or just DaisySP by itself. Teensy Audio is fast and memory efficient but has a limited selection of DSP functions. DaisySP is a bit of a CPU and memory hog but it has some sophisticated audio processing functions. The Teensy 4.x is VERY fast and you can do a lot of signal processing with it. The Raspberry Pi Pico 2 is quite a bit slower than the Teensy 4 but it still capable of fairly complex digital signal processing.
  
 DaisySP consists mostly of code collected from other projects - Csound, Soundpipe, and Mutable Instruments eurorack modules. DaisySP is quite similar to Soundpipe but much better written and documented. I ported Soundpipe first and then realized DaisySP is much better.
 
@@ -66,7 +68,7 @@ I have not tested the library extensively. It should be fairly simple to add a D
 
 There are compile problems with the resonator objects. I think this an issue with derived classes but I have not been able to fix it as yet.
 
-Tested with Arduino 1.85 and Teensyduino 1.53.
+Originally ested with Arduino 1.85 and Teensyduino 1.53. Latest updates ested with Pico 2 and Arduino 2.2.7.
 
 Rich Heslip rheslip@hotmail.com
 

@@ -25,11 +25,11 @@ namespace daisysp
        to an independent module. \n
        Original code written by Emilie Gillet in 2016. \n
 */
-class String
+class KarplusString
 {
   public:
-    String() {}
-    ~String() {}
+    KarplusString() {}
+    ~KarplusString() {}
 
     /** Initialize the module.
         \param sample_rate Audio engine sample rate
@@ -74,7 +74,7 @@ class String
         NON_LINEARITY_DISPERSION
     };
 
-    template <String::StringNonLinearity non_linearity>
+    template <KarplusString::StringNonLinearity non_linearity>
     float ProcessInternal(const float in);
 
     DelayLine<float, kDelayLineSize>     string_;

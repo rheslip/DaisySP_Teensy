@@ -2,7 +2,9 @@
 #ifndef DSYSP_REVERBSC_H
 #define DSYSP_REVERBSC_H
 
-#define DSY_REVERBSC_MAX_SIZE 98936
+#define DSY_REVERBSC_MAX_SIZE 98936  // this seems to be a magic number
+//#define DSY_REVERBSC_MAX_SIZE 49468 // crashes with other value
+
 
 namespace daisysp
 {
@@ -56,6 +58,7 @@ class ReverbSc
         \param freq - low pass frequency. range: 0.0 to sample_rate / 2
     */
     inline void SetLpFreq(const float &freq) { lpfreq_ = freq; }
+
 
   private:
     void       NextRandomLineseg(ReverbScDl *lp, int n);

@@ -1,12 +1,19 @@
+/*
+Copyright (c) 2020 Electrosmith, Corp, Emilie Gillet
+
+Use of this source code is governed by an MIT-style
+license that can be found in the LICENSE file or at
+https://opensource.org/licenses/MIT.
+*/
+
 #pragma once
 #ifndef DSY_ANALOG_BD_H
 #define DSY_ANALOG_BD_H
 
 #include <stdint.h>
-#ifdef __cplusplus
-
 #include "Synthesis/oscillator.h"
 #include "Filters/svf.h"
+#ifdef __cplusplus
 
 /** @file analogbassdrum.h */
 

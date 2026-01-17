@@ -1,7 +1,9 @@
 #include <math.h>
 #include "svf.h"
 #include "../utility/dsp.h"
-#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
+// MIN is already defined in the Pico SDK
+//#define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 using namespace daisysp;
 
